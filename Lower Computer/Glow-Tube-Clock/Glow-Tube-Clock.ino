@@ -46,15 +46,15 @@ void Main_Task(void* pvParameters)
 void setup()
 {
   Serial.begin(115200);
-  WS2812B_Init();
-  HC595_Init();
-  if(Internet_Init() == false)
+  WS2812B_Init();                         //LED灯串初始化
+  HC595_Init();                           //HC595初始化
+  if(Internet_Init() == false)            //如果网络连接初始化失败(即直接连接失败)
   {
-    WiFi_Connect();
+    WiFi_Connect();                       //尝试重连,若仍失败则进入配网流程
     while(1)
     {
       Check_Request();
-      if(Check_Connect(true) == true)
+      if(Check_Connect(true) == true)     //配网成功
       {
         break;
       }

@@ -7,7 +7,7 @@ const char* ntpServer = "pool.ntp.org";             //网络时间服务器
 const long gmtOffset_sec = 8 * 3600;                //设置时区为东八区
 const int daylightOffset_sec = 0;                   //非夏令时为0,夏令时为3600
 
-const char* AP_SSID  = "Glow-Tube-Clock-Config";    //AP热点名称
+const char* AP_SSID  = "Glow-Tube-Clock-Config";    //AP标识符
 const char* HOST_NAME = "Glow-Tube-Clock_ESP32";    //设备名
 const byte DNS_PORT = 53;                           //DNS端口号
 const int webPort = 80;                             //Web端口号
@@ -43,13 +43,13 @@ boolean Internet_Init(void)
   String password_temp;                                                             //临时WiFi密码
   char ssid_nvs_temp[33];                                                           //WiFi标识符长度范围0~32
   char password_nvs_temp[64];                                                       //AES和TKIP加密的WiFi密码最大长度63
-  size_t ssid_size = 32;
-  size_t password_size = 63;
-  esp_err_t ret = nvs_flash_init();
+  size_t ssid_size = 32;                                                            //WiFi标识符长度
+  size_t password_size = 63;                                                        //WiFi密码长度
+  esp_err_t ret = nvs_flash_init();                                                 //NVS初始化
   if(ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
   {
-    nvs_flash_erase();                                                              //NVS出现错误，执行擦除
-    nvs_flash_init();                                                               //重新尝试初始化
+    nvs_flash_erase();                                                              //NVS出现错误,执行擦除
+    nvs_flash_init();                                                               //尝试再次初始化
   }
   if(nvs_open("WiFi_Config", NVS_READWRITE, &wifi_nvs_handle) == ESP_OK)            //打开命名空间"WiFi_Config"
   {                                
@@ -57,15 +57,15 @@ boolean Internet_Init(void)
     nvs_get_str(wifi_nvs_handle, "password", password_nvs_temp, &password_size);    //获取当前命名空间中的键名为"password"的值
     ssid_temp = ssid_nvs_temp;
     password_temp = password_nvs_temp;
-    if(ssid_temp.isEmpty() == false && password_temp.isEmpty() == false)
+    if(ssid_temp.isEmpty() == false && password_temp.isEmpty() == false)            //如果存储的ssid和password均不为空,则使用其尝试连接WiFi,否则使用默认ssid和password
     {
       ssid = ssid_temp;
       password = password_temp;
     }
   }
   nvs_close(wifi_nvs_handle);                                                       //关闭命名空间"WiFi_Config"
-  WiFi.begin(ssid, password);
-  while(WiFi.status() != WL_CONNECTED)
+  WiFi.begin(ssid, password);                                                       //开始连接WiFi
+  while(WiFi.status() != WL_CONNECTED)                                              //WiFi连接状态不为WL_CONNECTED(已连接)时
   {
     delay(1000);
     Connect_Timeout++;
@@ -74,7 +74,7 @@ boolean Internet_Init(void)
       return false;                                                                 //一秒检查一次网络连接状态,10秒未成功连接则判定超时
     }
   }
-  if(WiFi.status() == WL_CONNECTED)
+  if(WiFi.status() == WL_CONNECTED)                                                 //WiFi连接状态为WL_CONNECTED(已连接)
   {
     return true;
   }
@@ -85,8 +85,8 @@ boolean Internet_Init(void)
  * @param     无
  * @return    无
  * @exception 无
- * @author    喜暖知寒
- * @date      2023-03-03 22:44:42
+ * @author    CSDN喜暖知寒,Achan Wang修改
+ * @date      2024-8-4 20:00:00
  * @version   1.0
  * @property  无
  * */
@@ -107,8 +107,8 @@ void Handle_Root(void)
  * @param     无
  * @return    无
  * @exception 无
- * @author    喜暖知寒
- * @date      2023-03-03 22:44:42
+ * @author    CSDN喜暖知寒,Achan Wang修改
+ * @date      2024-8-4 20:00:00
  * @version   1.0
  * @property  无
  * */
@@ -117,7 +117,7 @@ void Handle_Config(void)
   if(server.hasArg("ssid"))
   {
     ssid = server.arg("ssid");
-    save_ssid = ssid;
+    save_ssid = ssid;                     //在WiFi_Connect函数中可能会清除ssid的值,因此在从网页获取报表数据后立即转存
   }
   else
   {
@@ -127,7 +127,7 @@ void Handle_Config(void)
   if(server.hasArg("pass"))
   {
     password = server.arg("pass");
-    save_password = password;
+    save_password = password;             //在WiFi_Connect函数中可能会清除password的值,因此在从网页获取报表数据后立即转存
   }
   else
   {
@@ -136,9 +136,9 @@ void Handle_Config(void)
   }
   server.send(200, "text/html", "<meta charset='UTF-8'>SSID:" + ssid + "<br />password:" + password + "<br />已取得WiFi信息,正在尝试连接,请手动关闭此页面。");
   delay(2000);
-  WiFi.softAPdisconnect(true);
-  server.close();
-  WiFi.softAPdisconnect();
+  WiFi.softAPdisconnect(true);            //关闭AP模式
+  server.close();                         //关闭服务器
+  WiFi.softAPdisconnect();                //空参调用,清除AP模式的网络名和密码
   if(WiFi.status() != WL_CONNECTED)
   {
     WiFi_Connect();
@@ -150,8 +150,8 @@ void Handle_Config(void)
  * @param     无
  * @return    无
  * @exception 无
- * @author    喜暖知寒
- * @date      2023-03-03 22:44:42
+ * @author    CSDN喜暖知寒,Achan Wang修改
+ * @date      2024-8-4 20:00:00
  * @version   1.0
  * @property  无
  * */
@@ -166,8 +166,8 @@ void Check_Request(void)
  * @param     无
  * @return    无
  * @exception 无
- * @author    喜暖知寒
- * @date      2023-03-03 22:44:42
+ * @author    CSDN喜暖知寒,Achan Wang修改
+ * @date      2024-8-4 20:00:00
  * @version   1.0
  * @property  无
  * */
@@ -186,8 +186,8 @@ void APMode_Init(void)
  * @param     无
  * @return    无
  * @exception 无
- * @author    喜暖知寒
- * @date      2023-03-03 22:44:42
+ * @author    CSDN喜暖知寒,Achan Wang修改
+ * @date      2024-8-4 20:00:00
  * @version   1.0
  * @property  无
  * */
@@ -204,8 +204,8 @@ void DNS_Init(void)
  * @param     无
  * @return    无
  * @exception 无
- * @author    喜暖知寒
- * @date      2023-03-03 22:44:42
+ * @author    CSDN喜暖知寒,Achan Wang修改
+ * @date      2024-8-4 20:00:00
  * @version   1.0
  * @property  无
  * */
@@ -222,8 +222,8 @@ void WebServer_Init(void)
  * @param     无
  * @return    布尔型 返回true表示已扫描到WiFi,返回false表示未扫描到WiFi
  * @exception 无
- * @author    喜暖知寒
- * @date      2023-03-03 22:44:42
+ * @author    CSDN喜暖知寒,Achan Wang修改
+ * @date      2024-8-4 20:00:00
  * @version   1.0
  * @property  无
  * */
@@ -251,8 +251,8 @@ boolean WiFi_Scan(void)
  * @param     无
  * @return    无
  * @exception 无
- * @author    喜暖知寒
- * @date      2023-03-03 22:44:42
+ * @author    CSDN喜暖知寒,Achan Wang修改
+ * @date      2024-8-4 20:00:00
  * @version   1.0
  * @property  无
  * */
@@ -261,13 +261,13 @@ void WiFi_Connect(void)
   unsigned char Connect_Timeout = 0;                //超时计数
   WiFi.hostname(HOST_NAME);
   WiFi.mode(WIFI_STA);
-  if(ssid != "")
+  if(ssid != "")                                    //如果WiFi标识符不为空(可以没有密码)
   {
     WiFi.begin(ssid.c_str(), password.c_str());
     ssid = "";
     password = "";
   }
-  else
+  else                                              //如果WiFi标识符为空则空参调用,尝试使用最后一次正常连接的参数连接WiFi
   {
     WiFi.begin();
   }
@@ -275,18 +275,18 @@ void WiFi_Connect(void)
   {
     delay(1000);
     Connect_Timeout++;
-    if(Connect_Timeout > 9)
+    if(Connect_Timeout > 9)                         //一秒检查一次网络连接状态,10秒未成功连接则判定超时
     {
-      APMode_Init();
-      DNS_Init();
-      WebServer_Init();
-      WiFi_Scan();
-      return;
+      APMode_Init();                                //初始化AP模式
+      DNS_Init();                                   //初始化DNS
+      WebServer_Init();                             //初始化网络服务器
+      WiFi_Scan();                                  //扫描附近WiFi
+      return;                                       //判断超时后退出循环,等待网页填写报表
     }
   }
   if(WiFi.status() == WL_CONNECTED)
   {
-    server.stop();
+    server.stop();                                  //终止服务器
   }
 }
 
@@ -295,8 +295,8 @@ void WiFi_Connect(void)
  * @param     布尔型 传入true表示需要重连,传入false表示不需要重连
  * @return    布尔型 返回true表示WiFi连接成功,返回false表示WiFi连接失败
  * @exception 无
- * @author    喜暖知寒
- * @date      2023-03-03 22:44:42
+ * @author    CSDN喜暖知寒,Achan Wang修改
+ * @date      2024-8-4 20:00:00
  * @version   1.0
  * @property  无
  * */

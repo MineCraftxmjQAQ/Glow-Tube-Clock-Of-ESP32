@@ -9,13 +9,7 @@
 #include <nvs_flash.h>
 
 boolean Internet_Init(void);
-void Handle_Root(void);
-void Handle_Config(void);
 void Check_Request(void);
-void APMode_Init(void);
-void DNS_Init(void);
-void WebServer_Init(void);
-boolean WiFi_Scan(void);
 void WiFi_Connect(void);
 boolean Check_Connect(boolean reConnect);
 void Timer(void);
