@@ -319,8 +319,8 @@ boolean Check_Connect(boolean reConnect)
     }
     if(nvs_open("WiFi_Config", NVS_READWRITE, &wifi_nvs_handle) == ESP_OK)        //打开命名空间"WiFi_Config"
     {
-      esp_err_t ret = nvs_set_str(wifi_nvs_handle, "ssid", save_ssid.c_str());    //写入当前命名空间中的键名为"ssid"的值
-      ret = nvs_set_str(wifi_nvs_handle, "password", save_password.c_str());      //写入当前命名空间中的键名为"password"的值
+      nvs_set_str(wifi_nvs_handle, "ssid", save_ssid.c_str());                    //写入当前命名空间中的键名为"ssid"的值
+      nvs_set_str(wifi_nvs_handle, "password", save_password.c_str());            //写入当前命名空间中的键名为"password"的值
       nvs_commit(wifi_nvs_handle);                                                //提交修改
     }
     nvs_close(wifi_nvs_handle);                                                   //关闭命名空间"WiFi_Config"

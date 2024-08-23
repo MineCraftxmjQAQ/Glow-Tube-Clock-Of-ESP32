@@ -3,7 +3,7 @@
 
 #define LED_TYPE                  WS2812            //LED型号
 #define WS2812B_DIN               16                //LED数据输入引脚
-#define WS2812B_NUM               1                 //LED数量
+#define WS2812B_NUM               6                 //LED数量
 #define WS2812B_MAX_BRIGHT        255               //LED亮度,范围0~255
 #define WS2812B_COLOR_ORDER       GRB               //LED灯珠排列顺序
 
@@ -70,5 +70,10 @@ void WS2812B_ColorCtrl(void)
     }
   }
   WS2812B_LIST[0] = CHSV(hVal, 255, 255);
+  WS2812B_LIST[1] = CHSV(hVal, 255, 255);
+  WS2812B_LIST[2] = CHSV(hVal, 255, 255);
+  WS2812B_LIST[3] = CHSV(hVal, 255, 255);
+  WS2812B_LIST[4] = CHSV(hVal, 255, 255);
+  WS2812B_LIST[5] = CHSV(hVal, 255, 255);
   FastLED.show();
 }

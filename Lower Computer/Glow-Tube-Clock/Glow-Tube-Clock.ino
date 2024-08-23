@@ -1,5 +1,6 @@
-#include "MyLED.h"
 #include "MyHC595.h"
+#include "MyKey.h"
+#include "MyLED.h"
 #include "MyNeonLamp.h"
 #include "MyWiFi.h"
 
@@ -38,16 +39,19 @@ void Main_Task(void* pvParameters)
 {
   while(1)
   {
-    WS2812B_ColorCtrl();
     GlowTube_Clock_Ctrl();
+    Key_Ctrl();
+    WS2812B_ColorCtrl();
+    delay(10);
   }
 }
 
 void setup()
 {
   Serial.begin(115200);
-  WS2812B_Init();                         //LED灯串初始化
   HC595_Init();                           //HC595初始化
+  Key_Init();                             //按键初始化
+  WS2812B_Init();                         //LED灯串初始化
   if(Internet_Init() == false)            //如果网络连接初始化失败(即直接连接失败)
   {
     WiFi_Connect();                       //尝试重连,若仍失败则进入配网流程
