@@ -18,8 +18,8 @@ WebServer server(webPort);                          //开启Web服务
 
 String scanNetworksID = "";                         //储存扫描到的WiFi标识符
 
-String ssid = "TP-LINK_2C6046";                     //WiFi标识符
-String password = "xywyj7152069127571516975";       //WiFi密码
+String ssid = "423";                                //WiFi标识符
+String password = "rh324324";                       //WiFi密码
 
 String save_ssid;                                   //用于保存的WiFi标识符
 String save_password;                               //用于保存的WiFi密码

@@ -42,7 +42,7 @@ void Main_Task(void* pvParameters)
     GlowTube_Clock_Ctrl();
     Key_Ctrl();
     WS2812B_ColorCtrl();
-    delay(10);
+    delay(100);
   }
 }
 
